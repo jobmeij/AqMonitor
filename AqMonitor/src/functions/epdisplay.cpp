@@ -89,25 +89,25 @@ void EpDisplay::updateData(float temp, float humid, float press, float iaq, floa
         co2Text = "CO2: " + String(co2,0) + " ppm";
         switch (int(iaq)) {
             case 0 ... 50:
-                iaqStatusText = "IAQ: Excellent";
+                iaqStatusText = "IAQ: Excellent :D";
                 break;
             case 51 ... 100:
-                iaqStatusText = "IAQ: Good";
+                iaqStatusText = "IAQ: Good :)";
                 break;
             case 101 ... 150:
                 iaqStatusText = "IAQ: Light pollution";
                 break;
             case 151 ... 200:
-                iaqStatusText = "IAQ: Moderate pollution";
+                iaqStatusText = "IAQ: Moderate pollution - vent!";
                 break;
             case 201 ... 250:
-                iaqStatusText = "IAQ: Heavy pollution";
+                iaqStatusText = "IAQ: Heavy pollution :(";
                 break;
             case 251 ... 350:
-                iaqStatusText = "IAQ: Severe pollution";
+                iaqStatusText = "IAQ: Severe pollution >:(";
                 break;
             case 351 ... 500:
-                iaqStatusText = "IAQ: Extreme pollution";
+                iaqStatusText = "IAQ: Extreme pollution - rip";
                 break;
         }
     }
