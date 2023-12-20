@@ -1,3 +1,6 @@
+// class that reads BME680 sensor data and returns it as a string
+// Job Meijer - December 2023
+
 #ifndef IAQSENSOR_H
 #define IAQSENSOR_H
 
