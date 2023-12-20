@@ -8,6 +8,8 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_BusIO_Register.h>
 #include <Fonts/FreeMonoBold9pt7b.h>
+#include <Fonts/FreeSansBold9pt7b.h>
+#include <Fonts/FreeSerifBold9pt7b.h>
 
 // Definitions
 #define ENABLE_GxEPD2_GFX 0     // base class GxEPD2_GFX can be used to pass references or pointers to the display instance as parameter, uses ~1.2k more code
@@ -17,6 +19,9 @@
 #define PIN_EPD_DC 4
 #define PIN_EPD_RES 2
 #define PIN_EPD_BUSY 15
+#define FONT &FreeSansBold9pt7b     // other font options: &FreeMonoBold9pt7b, &FreeSansBold9pt7b, &FreeSerifBold9pt7b
+#define DISP_PIXEL_WIDTH 250
+#define DISP_PIXEL_HEIGHT 122
 
 // NOTE display has 250x122 pixels (width x height)
 
@@ -33,22 +38,10 @@ class EpDisplay
         void clearFullDisplay();
 
     private:
-        uint16_t box_x = 0; //10;
-        uint16_t box_y = 0; //15;
-        uint16_t box_w = 250;
-        uint16_t box_h = 20;        
-
-        void setTemperature(float temp);
-        void setHumidity(float hum);
-        void setPressure(float press);
-        void setIaq(float iaq);
-        void setCo2(float co2);
-        void setIaqStatus(uint8_t status);
-
-        //void initPartialBoxes();
-        void helloWorld(); 
-        void helloFullScreenPartialMode();
-        void showPartialUpdate();
+        uint16_t box_x = 2; 
+        uint16_t box_y = 0; 
+        uint16_t box_w = DISP_PIXEL_WIDTH;
+        uint16_t box_h = 19;
 
         GxEPD2_BW<GxEPD2_213_BN, GxEPD2_213_BN::HEIGHT> display;    // DEPG0213BN 122x250, SSD1680, 2.13" EPD Module
 

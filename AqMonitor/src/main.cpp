@@ -30,9 +30,7 @@ void loop() {
     Serial.println(iaqSens.outputString);
     
     if (dispUpdateCounter == dispUpdateInterval) {
-      epDisp.updateData(iaqSens.bsec.temperature, iaqSens.bsec.humidity, iaqSens.bsec.pressure, iaqSens.bsec.iaq, iaqSens.bsec.co2Equivalent, iaqSens.bsec.iaqAccuracy);
-      //epDisp.setTemperature(iaqSens.bsec.temperature);
-      //epDisp.setHumidity(iaqSens.bsec.humidity);
+      epDisp.updateData(iaqSens.bsec.temperature, iaqSens.bsec.humidity, iaqSens.bsec.pressure/100, iaqSens.bsec.iaq, iaqSens.bsec.co2Equivalent, iaqSens.bsec.iaqAccuracy);
       dispUpdateCounter = 0;
       Serial.println("Updating display.");
     } else {

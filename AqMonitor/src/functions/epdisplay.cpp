@@ -21,7 +21,7 @@ bool EpDisplay::init()
 void EpDisplay::printTextDoubleRow(String topText, String botText)
 {
     display.setRotation(1);
-    display.setFont(&FreeMonoBold9pt7b);
+    display.setFont(FONT);
     display.setTextColor(GxEPD_BLACK);
     int16_t tbx, tby; 
     uint16_t tbw, tbh;
@@ -50,7 +50,7 @@ void EpDisplay::printTextDoubleRow(String topText, String botText)
 void EpDisplay::clearFullDisplay()
 {
     display.setRotation(1);
-    display.setFont(&FreeMonoBold9pt7b);
+    display.setFont(FONT);
     display.setTextColor(GxEPD_BLACK);
     int16_t tbx, tby; 
     uint16_t tbw, tbh;  
@@ -68,46 +68,76 @@ void EpDisplay::clearFullDisplay()
 
 void EpDisplay::updateData(float temp, float humid, float press, float iaq, float co2, uint8_t iaqStatus)
 {
-    String tempText = "Temperature: " + String(temp,1) + " deg";      // round to 1 decimal
+    String tempText = "Temperature: " + String(temp,1) + " degC";   // round to 1 decimal
     String humidText = "Humidity: " + String(humid,1) + "%";        // round to 1 decimal
-    String pressText = "Pressure: " + String(press,1) + " hPa";      // round to 1 decimal
-    String iaqText = "IAQ: " + String(iaq,0);                       // round to 1 decimal
-    String co2Text = "CO2: " + String(co2,0) + " ppm";               // round to 1 decimal
-    String iaqStatusText = "IAQ calibrating...";
-    if (iaqStatus == 3) {
-        String iaqStatusText = "IAQ calibrated :D";
-    } 
+    String pressText = "Pressure: " + String(press,1) + " hPa";     // round to 1 decimal
+
+    String iaqText;
+    String co2Text;
+    String iaqStatusText;
+
+    if (iaqStatus == 0) {
+        iaqText = "IAQ: -";
+        co2Text = "CO2: -" ;
+        iaqStatusText = "Sensor starting...";    
+    } else if (iaqStatus == 1 || iaqStatus == 2) {
+        iaqText = "IAQ: " + String(iaq,0);                          // round to 1 decimal
+        co2Text = "CO2: " + String(co2,0) + " ppm";                 // round to 1 decimal
+        iaqStatusText = "IAQ calibrating... (" + String(iaqStatus) + ")";
+    } else if (iaqStatus == 3) {
+        iaqText = "IAQ: " + String(iaq,0);
+        co2Text = "CO2: " + String(co2,0) + " ppm";
+        switch (int(iaq)) {
+            case 0 ... 50:
+                iaqStatusText = "IAQ: Excellent";
+                break;
+            case 51 ... 100:
+                iaqStatusText = "IAQ: Good";
+                break;
+            case 101 ... 150:
+                iaqStatusText = "IAQ: Light pollution";
+                break;
+            case 151 ... 200:
+                iaqStatusText = "IAQ: Moderate pollution";
+                break;
+            case 201 ... 250:
+                iaqStatusText = "IAQ: Heavy pollution";
+                break;
+            case 251 ... 350:
+                iaqStatusText = "IAQ: Severe pollution";
+                break;
+            case 351 ... 500:
+                iaqStatusText = "IAQ: Extreme pollution";
+                break;
+        }
+    }
     
-    display.setRotation(1);
-    uint16_t cursor_y = box_y + box_h - 6;
-    //if (display.epd2.WIDTH < 104) cursor_y = box_y + 6;    
-    //uint16_t incr = display.epd2.hasFastPartialUpdate ? 1 : 3;
-    display.setFont(&FreeMonoBold9pt7b);
-    //if (display.epd2.WIDTH < 104) display.setFont(0);
+    display.setRotation(1);    
+    display.setFont(FONT);
     display.setTextColor(GxEPD_BLACK);  
-    display.setPartialWindow(0, 0, 250, 122);
+    display.setPartialWindow(box_x, box_y, DISP_PIXEL_WIDTH, DISP_PIXEL_HEIGHT);
 
     display.firstPage();
     do
     {
         display.fillRect(0,0, 250, 122, GxEPD_WHITE);
         // temp
-        display.setCursor(box_x, cursor_y);
+        display.setCursor(box_x, box_h);
         display.print(tempText);
         // humidity
-        display.setCursor(box_x, cursor_y*2);
+        display.setCursor(box_x, box_h*2);
         display.print(humidText);
         // pressure
-        display.setCursor(box_x, cursor_y*3);
+        display.setCursor(box_x, box_h*3);
         display.print(pressText);
         // iaq
-        display.setCursor(box_x, cursor_y*4);
+        display.setCursor(box_x, box_h*4);
         display.print(iaqText);
         // co2
-        display.setCursor(box_x, cursor_y*5);
+        display.setCursor(box_x, box_h*5);
         display.print(co2Text);
         // sensor status
-        display.setCursor(box_x, cursor_y*6);
+        display.setCursor(box_x, box_h*6);
         display.print(iaqStatusText);
     }
     while (display.nextPage());
