@@ -1,21 +1,15 @@
 #include "iaqSensor.hpp"
 
-IaqSensor::IaqSensor() {
-    
-
-    //output = "\nBSEC library version " + String(iaqSensor.version.major) + "." + String(iaqSensor.version.minor) + "." + String(iaqSensor.version.major_bugfix) + "." + String(iaqSensor.version.minor_bugfix);
-  //Serial.println(output);
-  
-
-  // Print the header
-  //output = "Timestamp [ms], IAQ, IAQ accuracy, Static IAQ, CO2 equivalent, breath VOC equivalent, raw temp[°C], pressure [hPa], raw relative humidity [%], gas [Ohm], Stab Status, run in status, comp temp[°C], comp humidity [%], gas percentage";
-  //Serial.println(output);
+IaqSensor::IaqSensor() : i2cScan(PIN_I2C_SDA, PIN_I2C_SCL) {
+      
 }
 
 bool IaqSensor::init() 
 {
-    Wire.begin(PIN_I2C_SDA, PIN_I2C_SCL);    // SDA, SCL
-    iaqSensor.begin(BME68X_I2C_ADDR_HIGH, Wire);    // HIGH = 0x77, LOW = 0x76 --> standard BME680 is HIGH address
+    Serial.println("Initializing IAQ sensor...");
+    Wire.begin(PIN_I2C_SDA, PIN_I2C_SCL);
+    i2cScan.scanI2c();
+    bsec.begin(BME68X_I2C_ADDR_HIGH, Wire);         // HIGH = 0x77, LOW = 0x76 --> standard BME680 is HIGH address
     pinMode(PIN_LED_BUILTIN, OUTPUT);
     checkIaqSensorStatus();
 
@@ -35,38 +29,36 @@ bool IaqSensor::init()
         BSEC_OUTPUT_GAS_PERCENTAGE
     };
 
-    iaqSensor.updateSubscription(sensorList, 13, BSEC_SAMPLE_RATE_LP);
+    bsec.updateSubscription(sensorList, 13, BSEC_SAMPLE_RATE_LP);
     checkIaqSensorStatus();
 
-    // digitalWrite(PIN_LED_BUILTIN, HIGH); 
-    // delay(500);
-    // digitalWrite(PIN_LED_BUILTIN, LOW); 
+    Serial.println("IAQ sensor initialized.");
     return true;
 }
 
 void IaqSensor::checkIaqSensorStatus()
 {
-  if (iaqSensor.bsecStatus != BSEC_OK) {
-    if (iaqSensor.bsecStatus < BSEC_OK) {
-      output = "BSEC error code : " + String(iaqSensor.bsecStatus);
-      Serial.println(output);
+  if (bsec.bsecStatus != BSEC_OK) {
+    if (bsec.bsecStatus < BSEC_OK) {
+      outputString = "BSEC error code : " + String(bsec.bsecStatus);
+      Serial.println(outputString);
       for (;;)
         errLeds(); /* Halt in case of failure */
     } else {
-      output = "BSEC warning code : " + String(iaqSensor.bsecStatus);
-      Serial.println(output);
+      outputString = "BSEC warning code : " + String(bsec.bsecStatus);
+      Serial.println(outputString);
     }
   }
 
-  if (iaqSensor.bme68xStatus != BME68X_OK) {
-    if (iaqSensor.bme68xStatus < BME68X_OK) {
-      output = "BME68X error code : " + String(iaqSensor.bme68xStatus);
-      Serial.println(output);
+  if (bsec.bme68xStatus != BME68X_OK) {
+    if (bsec.bme68xStatus < BME68X_OK) {
+      outputString = "BME680 error code : " + String(bsec.bme68xStatus);
+      Serial.println(outputString);
       for (;;)
         errLeds(); /* Halt in case of failure */
     } else {
-      output = "BME68X warning code : " + String(iaqSensor.bme68xStatus);
-      Serial.println(output);
+      outputString = "BME680 warning code : " + String(bsec.bme68xStatus);
+      Serial.println(outputString);
     }
   }
 }
@@ -82,25 +74,24 @@ void IaqSensor::errLeds()
 
 bool IaqSensor::checkSensor() {
     unsigned long time_trigger = millis();
-    //return iaqSensor.run();
-    if (iaqSensor.run()) { // If new data is available
-        digitalWrite(PIN_LED_BUILTIN, LOW);
-        output = String(time_trigger);
-        output += ", " + String(iaqSensor.iaq);
-        output += ", " + String(iaqSensor.iaqAccuracy);
-        output += ", " + String(iaqSensor.staticIaq);
-        output += ", " + String(iaqSensor.co2Equivalent);
-        output += ", " + String(iaqSensor.breathVocEquivalent);
-        output += ", " + String(iaqSensor.rawTemperature);
-        output += ", " + String(iaqSensor.pressure);
-        output += ", " + String(iaqSensor.rawHumidity);
-        output += ", " + String(iaqSensor.gasResistance);
-        output += ", " + String(iaqSensor.stabStatus);
-        output += ", " + String(iaqSensor.runInStatus);
-        output += ", " + String(iaqSensor.temperature);
-        output += ", " + String(iaqSensor.humidity);
-        output += ", " + String(iaqSensor.gasPercentage);
+    if (bsec.run()) { // If new data is available
         digitalWrite(PIN_LED_BUILTIN, HIGH);
+        outputString = String(time_trigger);
+        outputString += ", " + String(bsec.iaq);
+        outputString += ", " + String(bsec.iaqAccuracy);
+        outputString += ", " + String(bsec.staticIaq);
+        outputString += ", " + String(bsec.co2Equivalent);
+        outputString += ", " + String(bsec.breathVocEquivalent);
+        outputString += ", " + String(bsec.rawTemperature);
+        outputString += ", " + String(bsec.pressure);
+        outputString += ", " + String(bsec.rawHumidity);
+        outputString += ", " + String(bsec.gasResistance);
+        outputString += ", " + String(bsec.stabStatus);
+        outputString += ", " + String(bsec.runInStatus);
+        outputString += ", " + String(bsec.temperature);
+        outputString += ", " + String(bsec.humidity);
+        outputString += ", " + String(bsec.gasPercentage);
+        digitalWrite(PIN_LED_BUILTIN, LOW);
         return true;
     } else {
         return false;

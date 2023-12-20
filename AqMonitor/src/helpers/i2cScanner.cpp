@@ -1,0 +1,39 @@
+#include "i2cScanner.hpp"
+
+I2CScanner::I2CScanner(int pinSda, int pinScl) {
+    SDA = pinSda;
+    SCL = pinScl;
+}
+
+void I2CScanner::scanI2c()
+{
+    byte error, address;
+    int nDevices;
+    Serial.println("Scanning I2C bus for devices...");
+    nDevices = 0;
+    for(address = 1; address < 127; address++ ) {
+        Wire.beginTransmission(address);
+        error = Wire.endTransmission();
+        if (error == 0) {
+            Serial.print("I2C device found at address 0x");
+            if (address<16) {
+                Serial.print("0");
+            }
+            Serial.println(address,HEX);
+            nDevices++;
+        }
+        else if (error==4) {
+            Serial.print("Unknow error at address 0x");
+            if (address<16) {
+                Serial.print("0");
+            }
+            Serial.println(address,HEX);
+        }    
+    }
+    if (nDevices == 0) {
+        Serial.println("No I2C devices found\n");
+    }
+    else {
+        Serial.println("Done scanning I2C bus.\n");
+    }
+}

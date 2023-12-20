@@ -1,13 +1,21 @@
+// I2C scanner class
+// Job Meijer - December 2023
+
 #ifndef I2C_SCANNER_H
 #define I2C_SCANNER_H
 
+#include <Arduino.h>
+#include <Wire.h>
+
 class I2CScanner {
 public:
-    // Function to scan for available I2C devices
-    void scan();
+    I2CScanner(int pinSda, int pinScl);
+    void scanI2c();
 
 private:
-    // Private member variables or functions (if any)
+    int SDA;
+    int SCL;
+
 };
 
 #endif // I2C_SCANNER_H

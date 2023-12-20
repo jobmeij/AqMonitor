@@ -5,12 +5,12 @@
 #include <Arduino.h>
 #include <bsec.h>
 #include <Wire.h>
+#include "helpers/i2cScanner.hpp"
 
 // Definitions
 #define PIN_LED_BUILTIN 2
 #define PIN_I2C_SDA 22
 #define PIN_I2C_SCL 21
-
 
 class IaqSensor
 {
@@ -18,14 +18,15 @@ class IaqSensor
         IaqSensor();
         bool init();
         bool checkSensor();
-
-        String output;
+        
+        Bsec bsec;
+        String outputString;
 
     private:
+        I2CScanner i2cScan;
+
         void checkIaqSensorStatus();
         void errLeds();
-
-        Bsec iaqSensor;
 
 };
 
